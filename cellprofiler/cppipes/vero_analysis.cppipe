@@ -1,0 +1,546 @@
+CellProfiler Pipeline: http://www.cellprofiler.org
+Version:5
+DateRevision:413
+GitHash:
+ModuleCount:27
+HasImagePlaneDetails:False
+
+LoadData:[module_num:1|svn_version:'Unknown'|variable_revision_number:6|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Input data file location:Default Input Folder sub-folder|Documents/Education/MasterProject/code/pipeline/v3/features/VERO-1/Plate1/load_data_inputs/VERO-1_AA02
+    Name of the file:loadData.csv
+    Load images based on this data?:Yes
+    Base image location:Default Input Folder|Documents/Education/Research/Project/Cellular Morphological/code/CPpipelines/in_docker/input
+    Process just a range of rows?:No
+    Rows to process:1,100000
+    Group images by metadata?:Yes
+    Select metadata tags for grouping:Well
+    Rescale intensities?:Yes
+
+CorrectIlluminationApply:[module_num:2|svn_version:'Unknown'|variable_revision_number:5|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:OrigDNA
+    Name the output image:DNA
+    Select the illumination function:illumDNA
+    Select how the illumination function is applied:Divide
+    Select the input image:OrigRNA
+    Name the output image:RNA
+    Select the illumination function:illumRNA
+    Select how the illumination function is applied:Divide
+    Select the input image:OrigActinCyto
+    Name the output image:ActinCyto
+    Select the illumination function:illumAC
+    Select how the illumination function is applied:Divide
+    Select the input image:OrigER
+    Name the output image:EndoRet
+    Select the illumination function:illumER
+    Select how the illumination function is applied:Divide
+    Select the input image:OrigGolgi
+    Name the output image:Golgi
+    Select the illumination function:illumGAP
+    Select how the illumination function is applied:Divide
+    Set output image values less than 0 equal to 0?:Yes
+    Set output image values greater than 1 equal to 1?:Yes
+
+IdentifyPrimaryObjects:[module_num:3|svn_version:'Unknown'|variable_revision_number:14|show_window:True|notes:['The dna channel, e.g. DAPI, is perfect for segmenting individual cells. Given that these cells are well spaced, declumping cells by shape is effective.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:DNA
+    Name the primary objects to be identified:Nuclei
+    Typical diameter of objects, in pixel units (Min,Max):10,50
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Intensity
+    Method to draw dividing lines between clumped objects:Intensity
+    Size of smoothing filter:10
+    Suppress local maxima that are closer than this minimum allowed distance:7.0
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After declumping only
+    Automatically calculate size of smoothing filter for declumping?:Yes
+    Automatically calculate minimum allowed distance between local maxima?:Yes
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Display accepted local maxima?:No
+    Select maxima color:Blue
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:1.3488
+    Threshold correction factor:1.0
+    Lower and upper bounds on threshold:0.02,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+IdentifyPrimaryObjects:[module_num:4|svn_version:'Unknown'|variable_revision_number:14|show_window:True|notes:['The phosphorylated histone probe is a marker for detecting mitotic cells. By segmenting this channel, a threshold is automatically chosen that identifies the pixels that are “positive” for the PH3 probe. This method will yield inconsistent results if there are no mitotic cells in view, so a minimum threshold value is chosen. This minimum is chosen hueristically, based upon the threshold chosen by this module, e.g. half the chosen threshold.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:RNA
+    Name the primary objects to be identified:mitoticRNA
+    Typical diameter of objects, in pixel units (Min,Max):20,100
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Intensity
+    Method to draw dividing lines between clumped objects:Intensity
+    Size of smoothing filter:30
+    Suppress local maxima that are closer than this minimum allowed distance:7.0
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After declumping only
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:Yes
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Display accepted local maxima?:No
+    Select maxima color:Blue
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Minimum Cross-Entropy
+    Threshold smoothing scale:1.3488
+    Threshold correction factor:1.0
+    Lower and upper bounds on threshold:0.2,1.0
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:50
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+RelateObjects:[module_num:5|svn_version:'Unknown'|variable_revision_number:5|show_window:True|notes:['The ph3 probe and dna stain overlap with each other, so this co-localization can be used to classify cells. This is relatioship is ennumerated by the RelateObjects module and the labels from one set of objects is mapped into another set of objects.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:mitoticRNA
+    Child objects:Nuclei
+    Calculate child-parent distances?:None
+    Calculate per-parent means for all child measurements?:No
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+
+FilterObjects:[module_num:6|svn_version:'Unknown'|variable_revision_number:8|show_window:True|notes:['After the relationship between objects has been ennumerated, the FilterObjects module can transform this relationship into a binary relationship, i.e. 0 if there is no PH3 and 1 if there is PH3.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:Nuclei
+    Name the output objects:filteredNuclei
+    Select the filtering mode:Measurements
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:None
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Parent with most overlap
+    Select the measurement to filter by:Parent_mitoticRNA
+    Filter using a minimum measurement value?:No
+    Minimum value:
+    Filter using a maximum measurement value?:Yes
+    Maximum value:0
+
+ImageMath:[module_num:7|svn_version:'Unknown'|variable_revision_number:5|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Operation:Minimum
+    Raise the power of the result by:1.0
+    Multiply the result by:1.0
+    Add to result:0.0
+    Set values less than 0 equal to 0?:Yes
+    Set values greater than 1 equal to 1?:Yes
+    Replace invalid values with 0?:Yes
+    Ignore the image masks?:No
+    Name the output image:GAER
+    Image or measurement?:Image
+    Select the first image:ActinCyto
+    Multiply the first image by:1.0
+    Measurement:
+    Image or measurement?:Image
+    Select the second image:Golgi
+    Multiply the second image by:1
+    Measurement:
+    Image or measurement?:Image
+    Select the third image:EndoRet
+    Multiply the third image by:1.0
+    Measurement:
+
+IdentifySecondaryObjects:[module_num:8|svn_version:'Unknown'|variable_revision_number:10|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:Nuclei
+    Name the objects to be identified:Cells
+    Select the method to identify the secondary objects:Propagation
+    Select the input image:GAER
+    Number of pixels by which to expand the primary objects:10
+    Regularization factor:0.01
+    Discard secondary objects touching the border of the image?:Yes
+    Discard the associated primary objects?:No
+    Name the new primary objects:filteredNuclei
+    Fill holes in identified objects?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Robust Background
+    Threshold smoothing scale:0
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.1,0.8
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Three classes
+    Log transform before thresholding?:Yes
+    Assign pixels in the middle intensity class to the foreground or the background?:Foreground
+    Size of adaptive window:10
+    Lower outlier fraction:0
+    Upper outlier fraction:0
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2.0
+    Thresholding method:Otsu
+
+RelateObjects:[module_num:9|svn_version:'Unknown'|variable_revision_number:5|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Parent objects:mitoticRNA
+    Child objects:Cells
+    Calculate child-parent distances?:None
+    Calculate per-parent means for all child measurements?:No
+    Calculate distances to other parents?:No
+    Do you want to save the children with parents as a new object set?:No
+    Name the output object:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+    Parent name:None
+
+FilterObjects:[module_num:10|svn_version:'Unknown'|variable_revision_number:8|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the objects to filter:Cells
+    Name the output objects:filteredCells
+    Select the filtering mode:Measurements
+    Select the filtering method:Limits
+    Select the objects that contain the filtered objects:None
+    Select the location of the rules or classifier file:Elsewhere...|
+    Rules or classifier file name:rules.txt
+    Class number:1
+    Measurement count:1
+    Additional object count:0
+    Assign overlapping child to:Both parents
+    Select the measurement to filter by:Parent_mitoticRNA
+    Filter using a minimum measurement value?:No
+    Minimum value:0
+    Filter using a maximum measurement value?:Yes
+    Maximum value:0
+
+IdentifyTertiaryObjects:[module_num:11|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the larger identified objects:filteredCells
+    Select the smaller identified objects:filteredNuclei
+    Name the tertiary objects to be identified:Cytoplasm
+    Shrink smaller object prior to subtraction?:Yes
+
+MeasureColocalization:[module_num:12|svn_version:'Unknown'|variable_revision_number:5|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:ActinCyto, DNA, EndoRet, Golgi, RNA
+    Set threshold as percentage of maximum intensity for the images:15.0
+    Select where to measure correlation:Within objects
+    Select objects to measure:Cytoplasm, filteredCells, filteredNuclei
+    Run all metrics?:Yes
+    Calculate correlation and slope metrics?:Yes
+    Calculate the Manders coefficients?:Yes
+    Calculate the Rank Weighted Colocalization coefficients?:Yes
+    Calculate the Overlap coefficients?:Yes
+    Calculate the Manders coefficients using Costes auto threshold?:Yes
+    Method for Costes thresholding:Accurate
+
+MeasureGranularity:[module_num:13|svn_version:'Unknown'|variable_revision_number:4|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:ActinCyto, DNA, EndoRet, Golgi, RNA
+    Measure within objects?:Yes
+    Select objects to measure:Cytoplasm, filteredCells, filteredNuclei
+    Subsampling factor for granularity measurements:0.25
+    Subsampling factor for background reduction:0.25
+    Radius of structuring element:10
+    Range of the granular spectrum:16
+
+MeasureObjectIntensity:[module_num:14|svn_version:'Unknown'|variable_revision_number:4|show_window:True|notes:['In addition to colocalization, the intensity of the PH3 probe can be used to classify cells. The intensity can be measured within each nuclei object.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:ActinCyto, EndoRet, Golgi, RNA
+    Select objects to measure:Cytoplasm, filteredCells, filteredNuclei
+
+MeasureObjectNeighbors:[module_num:15|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select objects to measure:filteredCells
+    Select neighboring objects to measure:filteredCells
+    Method to determine neighbors:Within a specified distance
+    Neighbor distance:5
+    Consider objects discarded for touching image border?:Yes
+    Retain the image of objects colored by numbers of neighbors?:No
+    Name the output image:ObjectNeighborCount
+    Select colormap:Blues
+    Retain the image of objects colored by percent of touching pixels?:No
+    Name the output image:PercentTouching
+    Select colormap:Oranges
+
+MeasureObjectNeighbors:[module_num:16|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select objects to measure:filteredNuclei
+    Select neighboring objects to measure:filteredNuclei
+    Method to determine neighbors:Within a specified distance
+    Neighbor distance:1
+    Consider objects discarded for touching image border?:Yes
+    Retain the image of objects colored by numbers of neighbors?:No
+    Name the output image:ObjectNeighborCount
+    Select colormap:Blues
+    Retain the image of objects colored by percent of touching pixels?:No
+    Name the output image:PercentTouching
+    Select colormap:Oranges
+
+MeasureObjectNeighbors:[module_num:17|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select objects to measure:filteredCells
+    Select neighboring objects to measure:filteredCells
+    Method to determine neighbors:Adjacent
+    Neighbor distance:1
+    Consider objects discarded for touching image border?:Yes
+    Retain the image of objects colored by numbers of neighbors?:No
+    Name the output image:ObjectNeighborCount
+    Select colormap:Blues
+    Retain the image of objects colored by percent of touching pixels?:No
+    Name the output image:PercentTouching
+    Select colormap:Oranges
+
+MeasureObjectIntensityDistribution:[module_num:18|svn_version:'Unknown'|variable_revision_number:6|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:ActinCyto, DNA, EndoRet, Golgi, RNA
+    Hidden:3
+    Hidden:1
+    Hidden:0
+    Calculate intensity Zernikes?:Magnitudes only
+    Maximum zernike moment:9
+    Select objects to measure:filteredNuclei
+    Object to use as center?:These objects
+    Select objects to use as centers:None
+    Select objects to measure:Cytoplasm
+    Object to use as center?:These objects
+    Select objects to use as centers:None
+    Select objects to measure:Cells
+    Object to use as center?:These objects
+    Select objects to use as centers:None
+    Scale the bins?:Yes
+    Number of bins:4
+    Maximum radius:100
+
+MeasureObjectSizeShape:[module_num:19|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select object sets to measure:Cytoplasm, filteredCells, filteredNuclei
+    Calculate the Zernike features?:Yes
+    Calculate the advanced features?:Yes
+
+MeasureTexture:[module_num:20|svn_version:'Unknown'|variable_revision_number:7|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:ActinCyto, DNA, EndoRet, Golgi, RNA
+    Select objects to measure:Cytoplasm, filteredCells, filteredNuclei
+    Enter how many gray levels to measure the texture at:256
+    Hidden:3
+    Measure whole images or objects?:Both
+    Texture scale to measure:3
+    Texture scale to measure:5
+    Texture scale to measure:10
+
+OverlayOutlines:[module_num:21|svn_version:'Unknown'|variable_revision_number:4|show_window:True|notes:['The intensity measurements can be exported into a spreadsheet, but sometimes a useful way to process the measurements is to see them overlayed on top of the objects of interest, in this the nuclei.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:Yes
+    Select image on which to display outlines:OrigGreen
+    Name the output image:NucleiOutlines
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Inner
+    Select outline color:#00FF40
+    Select objects to display:filteredNuclei
+
+OverlayOutlines:[module_num:22|svn_version:'Unknown'|variable_revision_number:4|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Display outlines on a blank image?:Yes
+    Select image on which to display outlines:OrigGreen
+    Name the output image:CellOutlines
+    Outline display mode:Grayscale
+    Select method to determine brightness of outlines:Max of image
+    How to outline:Inner
+    Select outline color:#00FF40
+    Select objects to display:filteredCells
+
+SaveImages:[module_num:23|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:NucleiOutlines
+    Select method for constructing file names:Single name
+    Select image name for file prefix:None
+    Enter single file name:\g<Well>_s\g<Site>--nucleiOutlines
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:
+    Saved file format:png
+    Output file location:Default Input Folder sub-folder|\g<Well>/
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Last cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+
+SaveImages:[module_num:24|svn_version:'Unknown'|variable_revision_number:15|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:CellOutlines
+    Select method for constructing file names:Single name
+    Select image name for file prefix:None
+    Enter single file name:\g<Well>_s\g<Site>--cellOutlines
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:
+    Saved file format:png
+    Output file location:Default Input Folder sub-folder|\g<Well>/
+    Image bit depth:8-bit integer
+    Overwrite existing files without warning?:Yes
+    When to save:Last cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+
+ExportToSpreadsheet:[module_num:25|svn_version:'Unknown'|variable_revision_number:13|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the column delimiter:Comma (",")
+    Add image metadata columns to your object data file?:No
+    Add image file and folder names to your object data file?:No
+    Select the measurements to export:No
+    Calculate the per-image mean values for object measurements?:No
+    Calculate the per-image median values for object measurements?:No
+    Calculate the per-image standard deviation values for object measurements?:No
+    Output file location:Default Output Folder|\g<Well>/
+    Create a GenePattern GCT file?:No
+    Select source of sample row name:Metadata
+    Select the image to use as the identifier:None
+    Select the metadata to use as the identifier:Threshold_[None]
+    Export all measurement types?:Yes
+    Press button to select measurements:
+    Representation of Nan/Inf:NaN
+    Add a prefix to file names?:No
+    Filename prefix:
+    Overwrite existing files without warning?:Yes
+    Data to export:Do not use
+    Combine these object measurements with those of the previous object?:No
+    File name:DATA.csv
+    Use the object name for the file name?:Yes
+
+ExportToDatabase:[module_num:26|svn_version:'Unknown'|variable_revision_number:28|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Database type:SQLite
+    Database name:DefaultDB
+    Add a prefix to table names?:Yes
+    Table prefix:HRCE1_Plate1_
+    Output file location:Default Output Folder|
+    Create a CellProfiler Analyst properties file?:No
+    Database host:
+    Username:
+    Password:
+    Name the SQLite database file:hrce1_plate1.db
+    Calculate the per-image mean values of object measurements?:Yes
+    Calculate the per-image median values of object measurements?:No
+    Calculate the per-image standard deviation values of object measurements?:No
+    Calculate the per-well mean values of object measurements?:No
+    Calculate the per-well median values of object measurements?:No
+    Calculate the per-well standard deviation values of object measurements?:No
+    Export measurements for all objects to the database?:All
+    Select the objects:
+    Maximum # of characters in a column name:100
+    Create one table per object, a single object table or a single object view?:Single object table
+    Enter an image url prepend if you plan to access your files via http:
+    Write image thumbnails directly to the database?:No
+    Select the images for which you want to save thumbnails:
+    Auto-scale thumbnail pixel intensities?:Yes
+    Select the plate type:None
+    Select the plate metadata:None
+    Select the well metadata:None
+    Include information for all images, using default values?:Yes
+    Properties image group count:1
+    Properties group field count:1
+    Properties filter field count:0
+    Workspace measurement count:1
+    Experiment name:HRCE1-Plate1
+    Which objects should be used for locations?:None
+    Enter a phenotype class table name if using the Classifier tool in CellProfiler Analyst:
+    Export object relationships?:Yes
+    Overwrite without warning?:Data and schema
+    Access CellProfiler Analyst images via URL?:No
+    Select the classification type:Object
+    Select an image to include:None
+    Use the image name for the display?:Yes
+    Image name:Channel1
+    Channel color:red
+    Do you want to add group fields?:No
+    Enter the name of the group:
+    Enter the per-image columns which define the group, separated by commas:ImageNumber, Image_Metadata_Plate, Image_Metadata_Well
+    Do you want to add filter fields?:No
+    Automatically create a filter for each plate?:No
+    Create a CellProfiler Analyst workspace file?:No
+    Select the measurement display tool:ScatterPlot
+    Type of measurement to plot on the X-axis:Image
+    Enter the object name:None
+    Select the X-axis measurement:None
+    Select the X-axis index:ImageNumber
+    Type of measurement to plot on the Y-axis:Image
+    Enter the object name:None
+    Select the Y-axis measurement:None
+    Select the Y-axis index:ImageNumber
+
+CreateBatchFiles:[module_num:27|svn_version:'Unknown'|variable_revision_number:8|show_window:False|notes:[]|batch_state:array([], dtype=uint8)|enabled:False|wants_pause:False]
+    Store batch files in default output folder?:Yes
+    Output folder path:
+    Are the cluster computers running Windows?:No
+    Hidden- in batch mode:No
+    Hidden- in distributed mode:No
+    Hidden- default input folder at time of save:/Users/nahal
+    Hidden- revision number:0
+    Hidden- from old matlab:No
